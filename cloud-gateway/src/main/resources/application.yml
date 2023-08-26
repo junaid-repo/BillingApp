@@ -1,26 +1,17 @@
 server:
   port: 8090
 spring:
-  application-name: API-GATEWAY
+  application:
+    name: API-GATEWAY
 
 
   cloud:
     gateway:
       routes:
-        - id: SUSER-SERVICE
-          uri: lb://SUSER-SERVICE
+        - id: STOCK-SERVICE
+          uri: lb://STOCK-SERVICE
           predicates:
-            - Path=/sw/users/**
-
-        - id: SGROUPS-SERVICE
-          uri: lb://SGROUPS-SERVICE
-          predicates:
-            - Path=/sw/groups/**
-
-        - id: SBILLS-SERVICE
-          uri: lb://SBILLS-SERVICE
-          predicates:
-            - Path=/sw/bills/**
+            - Path=/bs/stocks/**
 
 eureka:
   client:
