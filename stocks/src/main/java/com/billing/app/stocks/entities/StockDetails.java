@@ -14,7 +14,16 @@ public class StockDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Integer id;
+    Integer id=0;
+    private String category;
+    private String brand;
+    private String model;
+    private Long units;
+    private Double costPerUnit;
+    private String shelfLocation;
+    private String status;
+
+
 
 
 }

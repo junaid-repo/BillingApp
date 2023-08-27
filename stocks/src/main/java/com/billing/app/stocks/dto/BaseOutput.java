@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class BaseOutput {
 
+    Integer id;
     String returnMsg;
     Long returnCode;
 }
