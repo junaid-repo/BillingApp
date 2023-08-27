@@ -81,7 +81,7 @@ public class StockServices {
 
         List<StockDetails> response = new ArrayList<>();
 
-        response = stockSaveRepo.searchStocksWithOr(req.getBrand(), req.getCategory(), req.getCost(), req.getModel());
+        response = stockSaveRepo.searchStocksWithOr(req.getBrand(), req.getCategory(), /*req.getCost(),*/ req.getModel());
 
         return response;
     }
