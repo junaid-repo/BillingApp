@@ -7,7 +7,12 @@ import com.billing.app.accounts.dto.ProductDetails;
 import com.billing.app.accounts.dto.ProductDetailsList;
 import com.billing.app.accounts.dto.TotalCartValue;
 import com.billing.app.accounts.entities.CollectionResponse;
+import com.billing.app.accounts.entities.ItemCountsEntity;
+import com.billing.app.accounts.entities.OrderDetails;
 import com.billing.app.accounts.externalapi.AccountsCommunicationFacade;
+import com.billing.app.accounts.repositories.AccountsCollectionRepository;
+import com.billing.app.accounts.repositories.AccountsOrderItemsRepository;
+import com.billing.app.accounts.repositories.AccountsOrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,12 @@ public class AccountsService {
 
     @Autowired
     AccountsCollectionRepository accCollRepo;
+
+    @Autowired
+    AccountsOrderRepository accOrderRepo;
+
+    @Autowired
+    AccountsOrderItemsRepository accOrderItemsRepo;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -96,6 +107,48 @@ public class AccountsService {
 
 
         }
+
+        OrderDetails orderDetails = new OrderDetails();
+        OrderDetails oout = new OrderDetails();
+        LocalDateTime date = LocalDateTime.now();
+
+        String orderCode = "";
+        orderDetails.setDiscount(totalDiscount);
+        orderDetails.setPrice(mrp);
+        orderDetails.setGst(totalGst);
+        orderDetails.setPackageCharge(totalPkgCharges);
+        orderDetails.setTotalPrice(totalPrice);
+        orderDetails.setCreatedDate(date);
+
+        oout = accOrderRepo.save(orderDetails);
+
+        if (oout.getId() > 0) {
+            orderCode = "OD0000" + String.valueOf(oout.getId());
+            oout.setOrderCode(orderCode);
+            oout = accOrderRepo.save(oout);
+        }
+
+        if (oout.getId() > 0) {
+            for (ProductDetails pd : products) {
+                int pId = pd.getProductId();
+                int pCount = pd.getUnits();
+
+
+                ItemCountsEntity ice = new ItemCountsEntity();
+
+                ice.setItemId(pId);
+                ice.setCounts(pCount);
+                ice.setCreatedDate(date);
+                ice.setStatus("N");
+                ice.setOrderId(oout.getId());
+
+                accOrderItemsRepo.save(ice);
+
+
+            }
+
+        }
+
         response.setPrice(mrp);
         response.setDiscount(totalDiscount);
         response.setGst(totalGst);
@@ -111,17 +164,17 @@ public class AccountsService {
         CollectionRequest out = new CollectionRequest();
         req.setStatus("I");
         req.setDate(date);
-        out=accCollRepo.save(req);
-        String voucherNo="";
-        if(out.getId()>0){
-            voucherNo="MB00001"+String.valueOf(out.getId());
+        out = accCollRepo.save(req);
+        String voucherNo = "";
+        if (out.getId() > 0) {
+            voucherNo = "MB00001" + String.valueOf(out.getId());
             out.setStatus("P");
             out.setVoucherNo(voucherNo);
 
         }
-        out=accCollRepo.save(req);
+        out = accCollRepo.save(req);
 
-        Runnable rn = new Runnable(){
+        Runnable rn = new Runnable() {
 
             @Override
             public void run() {
@@ -130,10 +183,10 @@ public class AccountsService {
             }
         };
 
-        if(out.getId()<0){
-           response.setReturnCode("444");
-           response.setReturnMsg("Something went wrong");
-           return response;
+        if (out.getId() < 0) {
+            response.setReturnCode("444");
+            response.setReturnMsg("Something went wrong");
+            return response;
         }
         response.setReturnMsg("Updated");
         response.setReturnCode("201");

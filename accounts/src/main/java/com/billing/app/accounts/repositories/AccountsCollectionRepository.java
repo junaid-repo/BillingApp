@@ -1,4 +1,4 @@
-package com.billing.app.accounts.service;
+package com.billing.app.accounts.repositories;
 
 import com.billing.app.accounts.dto.CollectionRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
