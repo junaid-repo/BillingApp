@@ -14,4 +14,5 @@ public class TotalCartValue {
     private Double gst;
     private Double packageCharge;
     private Double totalPrice;
+    private String orderId;
 }

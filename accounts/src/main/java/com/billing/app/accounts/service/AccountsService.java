@@ -28,7 +28,7 @@ import java.util.List;
 public class AccountsService {
 
     @Autowired
-    AccountsCommunicationFacade ssc;
+    AccountsCommunicationFacade comm;
 
     @Autowired
     AccountsCollectionRepository accCollRepo;
@@ -61,12 +61,12 @@ public class AccountsService {
             Double price;
             Integer pdId = pd.getProductId();
 
-            StockDetails stockDetails = ssc.getStockDetialsById(pdId);
+            StockDetails stockDetails = comm.getStockDetialsById(pdId);
             List<ChargesDetails> chargesDetails = new ArrayList<>();
 
             log.info("The stock details from external service call is --> " + stockDetails);
             String category = stockDetails.getCategory();
-            chargesDetails = ssc.getChargesDetails(category);
+            chargesDetails = comm.getChargesDetails(category);
 
 
             Double tGst = 0d;
@@ -154,6 +154,7 @@ public class AccountsService {
         response.setGst(totalGst);
         response.setPackageCharge(totalPkgCharges);
         response.setTotalPrice(totalPrice);
+        response.setOrderId(String.valueOf(oout.getId()));
 
         return response;
     }
@@ -174,15 +175,24 @@ public class AccountsService {
         }
         out = accCollRepo.save(req);
 
-        Runnable rn = new Runnable() {
 
-            @Override
-            public void run() {
+        Integer odId = req.getOrderId();
+
+        List<ItemCountsEntity> iceList = new ArrayList<>();
+
+        iceList = accOrderItemsRepo.findByOrderId(odId);
+
+        for (ItemCountsEntity iceTemp : iceList) {
+
+            String itemId = String.valueOf(iceTemp.getItemId());
+            String itemCount = String.valueOf(iceTemp.getCounts());
+
+            comm.updateProdCounts(itemId, itemCount);
 
 
 
-            }
-        };
+        }
+
 
         if (out.getId() < 0) {
             response.setReturnCode("444");

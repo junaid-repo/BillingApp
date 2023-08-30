@@ -1,5 +1,6 @@
 package com.billing.app.accounts.externalapi;
 
+import com.billing.app.accounts.apiClassModels.BaseOutput2;
 import com.billing.app.accounts.apiClassModels.ChargesDetails;
 import com.billing.app.accounts.apiClassModels.StockDetails;
 import org.slf4j.Logger;
@@ -44,6 +45,16 @@ public class AccountsCommunicationFacade {
         });
         log.info("the respose from getChargesDetails call --> " + response.getBody());
         return response.getBody();
+    }
+
+    public void updateProdCounts(String id, String count) {
+
+        final String uri = "http://" + "STOCK-SERVICE" + "/bs/stocks/updateStocksCounts/" + id+"/"+count;
+        log.info("The formatted uri is --> " + uri);
+
+        ResponseEntity<BaseOutput2> response = temp.exchange(uri, HttpMethod.POST, new HttpEntity<>(httpHeader()), BaseOutput2.class);
+        log.info("the respose from getChargesDetails call --> " + response.getBody());
+       // return response.getBody();
     }
 
     private HttpHeaders httpHeader() {
