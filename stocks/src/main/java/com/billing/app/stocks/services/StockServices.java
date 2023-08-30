@@ -71,6 +71,7 @@ public class StockServices {
     }
 
 
+
     public StockDetails findProdById(String id) {
 
         return stockSaveRepo.findById(id).get();

@@ -2,6 +2,7 @@ package com.billing.app.employees.services;
 
 import com.billing.app.employees.dto.BaseOutput;
 import com.billing.app.employees.entities.EmployeeDetails;
+import com.billing.app.employees.entities.EmployeeSales;
 import com.billing.app.employees.repository.EmployeeSaveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,12 @@ public class EmployeeServices {
             response.setReturnCode(201l);
             response.setReturnMsg("Employee created");
         }
+
+        return response;
+    }
+
+    public BaseOutput updateEmployeeSales(EmployeeSales req) {
+        BaseOutput response = new BaseOutput();
 
         return response;
     }

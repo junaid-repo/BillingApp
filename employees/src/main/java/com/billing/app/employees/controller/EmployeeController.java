@@ -2,6 +2,7 @@ package com.billing.app.employees.controller;
 
 import com.billing.app.employees.dto.BaseOutput;
 import com.billing.app.employees.entities.EmployeeDetails;
+import com.billing.app.employees.entities.EmployeeSales;
 import com.billing.app.employees.services.EmployeeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,14 @@ public class EmployeeController {
         BaseOutput response = new BaseOutput();
 
         response=serv.updateEmployee(req);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    @PostMapping("/updateEmpSales")
+    ResponseEntity<BaseOutput> updateEmployeeSales(@RequestBody EmployeeSales req){
+        BaseOutput response= new BaseOutput();
+
+        response=serv.updateEmployeeSales(req);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
