@@ -26,54 +26,74 @@ public class AccountsService {
     public TotalCartValue billing(ProductDetailsList req) {
         TotalCartValue response = new TotalCartValue();
 
+        Double discount;
+        Double gst;
+        Double mrp=0d;
 
         Double packageCharge;
         Double totalPrice = 0d;
         Double totalGst = 0d;
+        Double totalPkgCharges = 0d;
         Double totalDiscount = 0d;
 
         List<ProductDetails> products = req.getProducts();
 
 
         for (ProductDetails pd : products) {
+            Double price;
             Integer pdId = pd.getProductId();
 
             StockDetails stockDetails = ssc.getStockDetialsById(pdId);
             List<ChargesDetails> chargesDetails = new ArrayList<>();
 
-            log.info("The stock details from external service call is --> "+ stockDetails);
-            chargesDetails = ssc.getChargesDetails(stockDetails.getCategory());
-
-            Double price;
-            Double discount;
-            Double gst;
+            log.info("The stock details from external service call is --> " + stockDetails);
+            String category = stockDetails.getCategory();
+            chargesDetails = ssc.getChargesDetails(category);
 
 
+            Double tGst = 0d;
+            Double tDiscount = 0d;
+            Double tPkg = 0d;
 
 
+            price = stockDetails.getCostPerUnit() * pd.getUnits();
 
-            price = stockDetails.getCostPerUnit()*pd.getUnits();
+            for (ChargesDetails tempCharges : chargesDetails) {
+                if (tempCharges.getType().equals("GST")) {
+                    tGst = price * tempCharges.getCharge() / 100;
+                }
 
-            for(ChargesDetails tempCharges: chargesDetails){
-                if(tempCharges.getType().equals("GST")){
-                    gst=price*tempCharges.getCharge()/100;
+                if (tempCharges.getType().equals("DIS")) {
+                    if (tempCharges.getChargeType().equals("F"))
+                        tDiscount = tempCharges.getCharge();
+                    else
+                        tDiscount = price * tempCharges.getCharge() / 100;
+
+                }
+                if (tempCharges.getType().equals("PKG")) {
+                    if (tempCharges.getChargeType().equals("F"))
+                        tPkg = tempCharges.getCharge();
+                    else
+                        tPkg = price * tempCharges.getCharge() / 100;
+
                 }
 
             }
 
-
-
-            gst = price * 0.18;
-            packageCharge = 2.0;
-            discount = price * 0.10;
-            price = price + gst + packageCharge - discount;
-            totalGst = totalGst + gst;
-            totalDiscount = totalDiscount + discount;
+            mrp=mrp+price;
+            price = price + tGst + tPkg - tDiscount;
+            totalGst = totalGst + tGst;
+            totalDiscount = totalDiscount + tDiscount;
+            totalPkgCharges = totalPkgCharges + tPkg;
             totalPrice = totalPrice + price;
 
 
         }
-
+        response.setPrice(mrp);
+        response.setDiscount(totalDiscount);
+        response.setGst(totalGst);
+        response.setPackageCharge(totalPkgCharges);
+        response.setTotalPrice(totalPrice);
 
         return response;
     }
