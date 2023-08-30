@@ -86,4 +86,25 @@ public class StockServices {
 
         return response;
     }
+
+    public BaseOutput updateStocksCount(String id, String count) {
+        BaseOutput response = new BaseOutput();
+
+        Long updatedUnit = stockSaveRepo.findUnitCounts(Integer.parseInt(id)) -Integer.parseInt(count);
+
+        StockDetails sd =stockSaveRepo.findById(id).get();
+
+        sd.setUnits(updatedUnit);
+         sd =stockSaveRepo.save(sd);
+
+         if(sd.getId()<0){
+             response.setReturnCode(444l);
+             response.setReturnMsg("Something went wrong");
+             return response;
+         }
+         response.setReturnMsg("OK");
+         response.setReturnCode(201l);
+
+        return response;
+    }
 }

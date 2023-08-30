@@ -42,6 +42,14 @@ public class StocksController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+    @PostMapping("/updateStocksCounts/{id}/{count}")
+    ResponseEntity<BaseOutput> updateStockCounts(@PathVariable String id, @PathVariable String count)  {
+
+        BaseOutput response = new BaseOutput();
+        response = serv.updateStocksCount(id, count);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @GetMapping("/findProductById/{id}")
     ResponseEntity<StockDetails> findProductById(@PathVariable String id) {

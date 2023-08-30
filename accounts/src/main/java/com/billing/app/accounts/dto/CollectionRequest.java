@@ -23,5 +23,6 @@ public class CollectionRequest {
     private Double amount;
     private String collectionMode;
     private String status;
+    private Integer orderId;
 
 }
