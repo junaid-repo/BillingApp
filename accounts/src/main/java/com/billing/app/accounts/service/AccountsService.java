@@ -2,15 +2,19 @@ package com.billing.app.accounts.service;
 
 import com.billing.app.accounts.apiClassModels.ChargesDetails;
 import com.billing.app.accounts.apiClassModels.StockDetails;
+import com.billing.app.accounts.dto.CollectionRequest;
 import com.billing.app.accounts.dto.ProductDetails;
 import com.billing.app.accounts.dto.ProductDetailsList;
 import com.billing.app.accounts.dto.TotalCartValue;
+import com.billing.app.accounts.entities.CollectionResponse;
 import com.billing.app.accounts.externalapi.AccountsCommunicationFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +25,9 @@ public class AccountsService {
     @Autowired
     AccountsCommunicationFacade ssc;
 
+    @Autowired
+    AccountsCollectionRepository accCollRepo;
+
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     public TotalCartValue billing(ProductDetailsList req) {
@@ -28,7 +35,7 @@ public class AccountsService {
 
         Double discount;
         Double gst;
-        Double mrp=0d;
+        Double mrp = 0d;
 
         Double packageCharge;
         Double totalPrice = 0d;
@@ -80,7 +87,7 @@ public class AccountsService {
 
             }
 
-            mrp=mrp+price;
+            mrp = mrp + price;
             price = price + tGst + tPkg - tDiscount;
             totalGst = totalGst + tGst;
             totalDiscount = totalDiscount + tDiscount;
@@ -96,5 +103,44 @@ public class AccountsService {
         response.setTotalPrice(totalPrice);
 
         return response;
+    }
+
+    public CollectionResponse doCollection(CollectionRequest req) {
+        CollectionResponse response = new CollectionResponse();
+        LocalDateTime date = LocalDateTime.now();
+        CollectionRequest out = new CollectionRequest();
+        req.setStatus("I");
+        req.setDate(date);
+        out=accCollRepo.save(req);
+        String voucherNo="";
+        if(out.getId()>0){
+            voucherNo="MB00001"+String.valueOf(out.getId());
+            out.setStatus("P");
+            out.setVoucherNo(voucherNo);
+
+        }
+        out=accCollRepo.save(req);
+
+        Runnable rn = new Runnable(){
+
+            @Override
+            public void run() {
+
+
+            }
+        };
+
+        if(out.getId()<0){
+           response.setReturnCode("444");
+           response.setReturnMsg("Something went wrong");
+           return response;
+        }
+        response.setReturnMsg("Updated");
+        response.setReturnCode("201");
+        response.setVoucherNo(voucherNo);
+        response.setDate(date);
+
+        return response;
+
     }
 }

@@ -1,7 +1,9 @@
 package com.billing.app.accounts.controller;
 
+import com.billing.app.accounts.dto.CollectionRequest;
 import com.billing.app.accounts.dto.ProductDetailsList;
 import com.billing.app.accounts.dto.TotalCartValue;
+import com.billing.app.accounts.entities.CollectionResponse;
 import com.billing.app.accounts.service.AccountsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,14 @@ public class AccountsController {
         TotalCartValue response= new TotalCartValue();
 
         response=serv.billing(req);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    }
+    @PostMapping("/doCollection")
+    ResponseEntity<CollectionResponse> doCollection(@RequestBody CollectionRequest req){
+        CollectionResponse response= new CollectionResponse();
+        response=serv.doCollection(req);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
