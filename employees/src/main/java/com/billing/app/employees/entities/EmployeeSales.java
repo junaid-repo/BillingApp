@@ -20,8 +20,9 @@ public class EmployeeSales {
     private int id;
     private int empId;
     private LocalDateTime updatedDate;
-    private int custId;
+    private String customerCode;
     private Double amount;
+
 
 
 }

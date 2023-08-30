@@ -19,6 +19,7 @@ public class EmployeeDetails {
     private String name;
     private String gender;
     private String phone;
+    private String username;
 
     private String password;
     private String role;
