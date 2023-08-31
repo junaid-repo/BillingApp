@@ -33,6 +33,20 @@ public class StocksController {
         response = serv.saveCategory(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+    @GetMapping("/getCategory")
+    ResponseEntity<List<ProductCategory>> getAllCategory(){
+        List<ProductCategory> response= new ArrayList<>();
+        response=serv.getCategory();
+        return ResponseEntity.status(HttpStatus.FOUND).body(response);
+
+    }
+    @GetMapping("/getCategory/{code}")
+    ResponseEntity<ProductCategory> getCategory(@PathVariable String code){
+        ProductCategory response= new ProductCategory();
+        response=serv.getCategoryByCode(code);
+        return ResponseEntity.status(HttpStatus.FOUND).body(response);
+
+    }
 
     @PostMapping("/updateStocks")
     ResponseEntity<BaseOutput> addStocks(@RequestBody StockDetails req) throws SomethingWentWrongDuringSaveException {

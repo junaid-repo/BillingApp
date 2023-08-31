@@ -110,4 +110,14 @@ public class StockServices {
 
         return response;
     }
+
+    public ProductCategory getCategoryByCode(String code) {
+
+        return catSaveRepo.findById(code).get();
+    }
+
+    public List<ProductCategory> getCategory() {
+
+        return catSaveRepo.findAll();
+    }
 }
