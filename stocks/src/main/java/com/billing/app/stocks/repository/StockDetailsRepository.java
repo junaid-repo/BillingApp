@@ -14,4 +14,7 @@ public interface StockDetailsRepository extends JpaRepository<StockDetails, Stri
 
     @Query( value = "select * from stocks_details sd where sd.brand =?1 or sd.category =?2 or model =?3", nativeQuery = true)
     List<StockDetails> searchStocksWithOr( String brand, String category, /*@Param("cost") Double cost,*/  String model);
+
+    @Query( value = "select * from stocks_details sd where sd.brand = COALESCE(?1, sd.brand) and sd.category = COALESCE(?2,sd.category) and sd.model =COALESCE(?3, 'sd.model')", nativeQuery = true)
+    List<StockDetails> searchStocksWithAnd( String brand, String category, /*@Param("cost") Double cost,*/  String model);
 }
