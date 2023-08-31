@@ -10,6 +10,4 @@ import lombok.ToString;
 public class ProductDetails {
     private Integer productId;
     private Integer units;
-    private Integer discountPercentage;
-    private Integer extraCharges;
 }
