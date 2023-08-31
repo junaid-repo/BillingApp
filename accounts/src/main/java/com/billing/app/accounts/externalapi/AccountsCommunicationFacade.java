@@ -1,8 +1,6 @@
 package com.billing.app.accounts.externalapi;
 
-import com.billing.app.accounts.apiClassModels.BaseOutput2;
-import com.billing.app.accounts.apiClassModels.ChargesDetails;
-import com.billing.app.accounts.apiClassModels.StockDetails;
+import com.billing.app.accounts.apiClassModels.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +55,27 @@ public class AccountsCommunicationFacade {
        // return response.getBody();
     }
 
+    public void updateEmpSalesRecord(String number, String custCode, Double amount) {
+
+        EmployeeSales empSales= new EmployeeSales();
+        empSales.setAmount(amount);
+        empSales.setCustomerCode(custCode);
+        empSales.setEmpId(Integer.parseInt(number));
+
+        final String uri="http://" + "EMPLOYEE-SERVICE" + "bs/employee/updateEmpSales/";
+
+       // ResponseEntity<BaseOutput3> response=temp.exchange(uri,HttpMethod.POST, new HttpEntity<>(httpHeader()), BaseOutput3.class);
+        ResponseEntity<BaseOutput3> response1= temp.postForEntity(uri, empSales, BaseOutput3.class);
+
+    }
+
     private HttpHeaders httpHeader() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         return httpHeaders;
     }
+
 
 
 }

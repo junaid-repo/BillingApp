@@ -1,6 +1,7 @@
 package com.billing.app.accounts.service;
 
 import com.billing.app.accounts.apiClassModels.ChargesDetails;
+import com.billing.app.accounts.apiClassModels.EmployeeSales;
 import com.billing.app.accounts.apiClassModels.StockDetails;
 import com.billing.app.accounts.dto.CollectionRequest;
 import com.billing.app.accounts.dto.ProductDetails;
@@ -10,6 +11,7 @@ import com.billing.app.accounts.entities.CollectionResponse;
 import com.billing.app.accounts.entities.ItemCountsEntity;
 import com.billing.app.accounts.entities.OrderDetails;
 import com.billing.app.accounts.externalapi.AccountsCommunicationFacade;
+import com.billing.app.accounts.externalapi.EmpServiceFiengClient;
 import com.billing.app.accounts.repositories.AccountsCollectionRepository;
 import com.billing.app.accounts.repositories.AccountsOrderItemsRepository;
 import com.billing.app.accounts.repositories.AccountsOrderRepository;
@@ -38,6 +40,9 @@ public class AccountsService {
 
     @Autowired
     AccountsOrderItemsRepository accOrderItemsRepo;
+
+    @Autowired
+    EmpServiceFiengClient epFC;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -190,8 +195,20 @@ public class AccountsService {
             comm.updateProdCounts(itemId, itemCount);
 
 
-
         }
+
+        try {
+
+            EmployeeSales esales = new EmployeeSales();
+            esales.setEmpId(52);
+            esales.setAmount(req.getAmount());
+            esales.setCustomerCode(req.getCustCode());
+            epFC.updateEmployeeSales(esales);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+
 
 
         if (out.getId() < 0) {
