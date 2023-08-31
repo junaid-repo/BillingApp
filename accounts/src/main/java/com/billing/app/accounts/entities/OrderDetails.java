@@ -27,4 +27,5 @@ public class OrderDetails {
     private Double packageCharge;
     private Double totalPrice;
     private LocalDateTime createdDate;
+    private String orderStatus="F";
 }

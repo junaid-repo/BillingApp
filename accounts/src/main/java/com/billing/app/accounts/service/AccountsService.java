@@ -15,6 +15,7 @@ import com.billing.app.accounts.externalapi.EmpServiceFiengClient;
 import com.billing.app.accounts.repositories.AccountsCollectionRepository;
 import com.billing.app.accounts.repositories.AccountsOrderItemsRepository;
 import com.billing.app.accounts.repositories.AccountsOrderRepository;
+import com.billing.app.accounts.validations.OrderStatusValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class AccountsService {
 
     @Autowired
     EmpServiceFiengClient epFC;
+
+    @Autowired
+    OrderStatusValidation valOd;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -166,10 +170,23 @@ public class AccountsService {
 
     public CollectionResponse doCollection(CollectionRequest req) {
         CollectionResponse response = new CollectionResponse();
+        OrderDetails odOut = new OrderDetails();
+        odOut = valOd.validatedOrderStatus(req.getOrderId());
+
+        if (odOut.getOrderStatus().equals("T")) {
+            String msg = "Your order number " + odOut.getOrderCode() + " is already paid ";
+            response.setReturnCode("444");
+            response.setReturnMsg(msg);
+            return response;
+        }
+
+
         LocalDateTime date = LocalDateTime.now();
         CollectionRequest out = new CollectionRequest();
         req.setStatus("I");
         req.setDate(date);
+
+
         out = accCollRepo.save(req);
         String voucherNo = "";
         if (out.getId() > 0) {
@@ -179,6 +196,14 @@ public class AccountsService {
 
         }
         out = accCollRepo.save(req);
+
+        try {
+            odOut = accOrderRepo.updateOrderStatus(req.getOrderId(), "T");
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+
 
 
         Integer odId = req.getOrderId();
@@ -204,11 +229,9 @@ public class AccountsService {
             esales.setAmount(req.getAmount());
             esales.setCustomerCode(req.getCustCode());
             epFC.updateEmployeeSales(esales);
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-
 
 
         if (out.getId() < 0) {
