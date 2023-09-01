@@ -35,14 +35,23 @@ public class EmployeeServices {
 	public BaseOutput registerUser(UserCredential user) {
 
 		user.setPassword(psdEnocder.encode(user.getPassword()));
-
+		UserCredential out = new UserCredential();
 		BaseOutput response = new BaseOutput();
+		String username = "";
 
-		userRegRepo.save(user);
+		out = userRegRepo.save(user);
+
+		if (out.getId() > 0) {
+			username = user.getName().replaceAll("\\s", "").toLowerCase() + String.valueOf(out.getId());
+		}
+
+		out.setUsername(username);
+		
+		out=userRegRepo.save(out);
 
 		response.setReturnCode(201l);
 		response.setReturnMsg("User Created");
-		response.setUsername("na");
+		response.setUsername(username);
 		// TODO Auto-generated method stub
 		return response;
 	}

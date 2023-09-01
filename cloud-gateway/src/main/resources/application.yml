@@ -12,18 +12,26 @@ spring:
           uri: lb://STOCK-SERVICE
           predicates:
             - Path=/bs/stocks/**
+            
         - id: EMPLOYEE-SERVICE
           uri: lb://EMPLOYEE-SERVICE
           predicates:
             - Path=/bs/employee/**
+          filters:
+           - AuthenticationFilter
+           
         - id: ACCOUNTS-SERVICE
           uri: lb://ACCOUNTS-SERVICE
           predicates:
             - Path=/bs/accounts/**
+          filters:
+           - AuthenticationFilter
+            
         - id: EXTRACHARGES-SERVICE
           uri: lb://EXTRACHARGES-SERVICE
           predicates:
             - Path=/bs/charges/**
+           
 
 eureka:
   client:

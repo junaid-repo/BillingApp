@@ -10,4 +10,6 @@ public interface UserRegisterRepository extends JpaRepository<UserCredential, In
 
 	Optional<UserCredential> findByName(String username);
 
+	Optional<UserCredential> findByUsername(String username);
+
 }
