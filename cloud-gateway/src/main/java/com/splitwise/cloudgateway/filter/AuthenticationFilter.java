@@ -38,14 +38,14 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 					authHeader = authHeader.substring(7);
 				}
 				try {
-					String uri="http://localhost:8090/bs/employee/auth/validateToken/" + authHeader;
-					String response= template.getForObject(uri, String.class);
+					//String uri="http://localhost:8090/bs/employee/auth/validateToken/" + authHeader;
+					//String response= template.getForObject(uri, String.class);
 
 					//String response= template.getForObject("http://localhost:8090/bs/employee/auth/validateToken/" + authHeader, String.class);
-					System.out.println("The response of validate token call   "+response);
+					//System.out.println("The response of validate token call   "+response);
 //                    //REST call to AUTH service
 //                   
-					//jwtUtil.validateToken(authHeader);
+					jwtUtil.validateToken(authHeader);
 
 				} catch (Exception e) {
 					System.out.println("invalid access...!");

@@ -43,4 +43,14 @@ public class ChargesService {
 
 
     }
+    public List<ChargesDetails> getChargesDetails() {
+
+        List<ChargesDetails> response = new ArrayList<>();
+
+        response=chargesSaveRepo.findAll();
+
+        return response;
+
+
+    }
 }

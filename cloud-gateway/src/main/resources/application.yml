@@ -31,6 +31,22 @@ spring:
           uri: lb://EXTRACHARGES-SERVICE
           predicates:
             - Path=/bs/charges/**
+          filters:
+           - AuthenticationFilter
+           
+        - id: CUSTOMER-SERVICE
+          uri: lb://CUSTOMER-SERVICE
+          predicates:
+            - Path=/bs/customer/**
+          filters:
+           - AuthenticationFilter
+           
+        - id: MEDSTOCKS-SERVICE
+          uri: lb://MEDSTOCKS-SERVICE
+          predicates:
+            - Path=/bs/medStocks/**
+          filters:
+           - AuthenticationFilter                        
            
 
 eureka:

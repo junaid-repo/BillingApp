@@ -17,6 +17,9 @@ public class AccountsCommunicationFacade {
 
     @Autowired
     RestTemplate temp;
+    
+    @Autowired
+    EmpServiceFiengClient epFC;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -72,8 +75,21 @@ public class AccountsCommunicationFacade {
     private HttpHeaders httpHeader() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        httpHeaders.setBearerAuth(getJwtToken());
 
         return httpHeaders;
+    }
+    
+    private String getJwtToken() {
+    	
+    	AuthRequest auth= new AuthRequest();
+    	auth.setUsername("atifsohail5");
+    	auth.setPassword("pass");
+    	
+    	String token=epFC.generateToken(auth).getBody();
+    	System.out.println("the generated token is --> "+token);
+    	
+    	return null;
     }
 
 

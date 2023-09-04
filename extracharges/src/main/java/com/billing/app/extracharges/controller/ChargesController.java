@@ -37,4 +37,13 @@ public class ChargesController {
 
 
     }
+    @GetMapping("/get")
+    ResponseEntity<List<ChargesDetails>> getChargesDetails(){
+        List<ChargesDetails> response= new ArrayList<>();
+        response=serv.getChargesDetails();
+
+        return ResponseEntity.status(HttpStatus.FOUND).body(response);
+
+
+    }
 }
