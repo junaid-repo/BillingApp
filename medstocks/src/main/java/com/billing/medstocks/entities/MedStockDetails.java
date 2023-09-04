@@ -32,5 +32,6 @@ public class MedStockDetails {
 	private String batchNo = null;
 	private Long units = 0l;
 	private LocalDate expiryDate;
+	private Double costPerUnit=0d;
 
 }
