@@ -12,6 +12,8 @@ spring:
           uri: lb://STOCK-SERVICE
           predicates:
             - Path=/bs/stocks/**
+          filters:
+           - AuthenticationFilter  
             
         - id: EMPLOYEE-SERVICE
           uri: lb://EMPLOYEE-SERVICE

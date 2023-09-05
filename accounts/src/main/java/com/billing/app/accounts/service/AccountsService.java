@@ -249,7 +249,7 @@ public class AccountsService {
     	od=getOrderDetails(req.getOrderCode());
         CollectionResponse response = new CollectionResponse();
         OrderDetails odOut = new OrderDetails();
-        odOut = valOd.validatedOrderStatus(req.getOrderId());
+        odOut = valOd.validatedOrderStatus(od.getId());
 
         if (odOut.getOrderStatus().equals("T")) {
             String msg = "Your order number " + odOut.getOrderCode() + " is already paid ";
@@ -331,7 +331,7 @@ public class AccountsService {
 
 	public OrderDetails getOrderDetails(String orderCode) {
 		// TODO Auto-generated method stub
-		return accOrderItemsRepo.findByOrderCode(orderCode);
+		return accOrderRepo.findByOrderCode(orderCode);
 	}
 	
 	public OrderDetailsResponse getOrderSummry(String orderCode) {

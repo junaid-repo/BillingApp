@@ -1,6 +1,7 @@
 package com.billing.app.accounts.controller;
 
 import com.billing.app.accounts.dto.CollectionRequest;
+import com.billing.app.accounts.dto.OrderDetailsResponse;
 import com.billing.app.accounts.dto.ProductDetailsList;
 import com.billing.app.accounts.dto.TotalCartValue;
 import com.billing.app.accounts.entities.CollectionResponse;
@@ -40,6 +41,15 @@ public class AccountsController {
     	OrderDetails response = new OrderDetails();
     	
     	response=serv.getOrderDetails(orderCode);
+    	
+    	return ResponseEntity.status(HttpStatus.FOUND).body(response);
+    	
+    }
+    @GetMapping("/orderSummry/{orderCode}")
+    ResponseEntity<OrderDetailsResponse> gerOrderSummry(@PathVariable String orderCode){
+    	OrderDetailsResponse response = new OrderDetailsResponse();
+    	
+    	response=serv.getOrderSummry(orderCode);
     	
     	return ResponseEntity.status(HttpStatus.FOUND).body(response);
     	
