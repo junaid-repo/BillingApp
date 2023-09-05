@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,10 +95,11 @@ public class StockServices {
         BaseOutput response = new BaseOutput();
 
         Long updatedUnit = stockSaveRepo.findUnitCounts(Integer.parseInt(id)) -Integer.parseInt(count);
-
+        LocalDateTime updatedDate= LocalDateTime.now();
         StockDetails sd =stockSaveRepo.findById(id).get();
 
         sd.setUnits(updatedUnit);
+        sd.setUpdatedDate(updatedDate);
          sd =stockSaveRepo.save(sd);
 
          if(sd.getId()<0){

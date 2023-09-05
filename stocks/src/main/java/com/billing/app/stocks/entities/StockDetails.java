@@ -1,7 +1,17 @@
 package com.billing.app.stocks.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Table(name = "StocksDetails")
 @Entity
@@ -22,6 +32,7 @@ public class StockDetails {
     private Double costPerUnit;
     private String shelfLocation;
     private String status=null;
+    private LocalDateTime updatedDate;
 
 
 
