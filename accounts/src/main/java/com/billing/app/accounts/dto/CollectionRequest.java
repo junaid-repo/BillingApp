@@ -24,5 +24,6 @@ public class CollectionRequest {
     private String collectionMode;
     private String status;
     private Integer orderId;
+    private String orderCode;
 
 }

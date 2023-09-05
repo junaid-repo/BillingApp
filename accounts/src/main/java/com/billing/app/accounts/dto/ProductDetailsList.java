@@ -11,5 +11,6 @@ import java.util.List;
 @ToString
 public class ProductDetailsList extends BaseInput{
     List<ProductDetails> products;
+    private String customerCode;
 
 }

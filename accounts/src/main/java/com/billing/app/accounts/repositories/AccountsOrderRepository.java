@@ -12,4 +12,7 @@ public interface AccountsOrderRepository extends JpaRepository<OrderDetails, Int
 
     @Query(value="update order_details set order_status=?2 where id=?1", nativeQuery = true)
     OrderDetails updateOrderStatus(Integer orderid, String status);
+
+    @Query(value="select * from order_details od where od.order_code=?1", nativeQuery = true)
+	OrderDetails findByOrderCode(String orderCode);
 }

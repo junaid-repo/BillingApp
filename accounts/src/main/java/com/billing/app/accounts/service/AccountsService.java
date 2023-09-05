@@ -1,30 +1,35 @@
 package com.billing.app.accounts.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.billing.app.accounts.apiClassModels.ChargesDetails;
+import com.billing.app.accounts.apiClassModels.CustomerDetails;
 import com.billing.app.accounts.apiClassModels.EmployeeSales;
 import com.billing.app.accounts.apiClassModels.StockDetails;
 import com.billing.app.accounts.dto.CollectionRequest;
+import com.billing.app.accounts.dto.OrderDetailsResponse;
+import com.billing.app.accounts.dto.OrderWiseProductDetailsDTO;
 import com.billing.app.accounts.dto.ProductDetails;
 import com.billing.app.accounts.dto.ProductDetailsList;
 import com.billing.app.accounts.dto.TotalCartValue;
 import com.billing.app.accounts.entities.CollectionResponse;
 import com.billing.app.accounts.entities.ItemCountsEntity;
 import com.billing.app.accounts.entities.OrderDetails;
+import com.billing.app.accounts.entities.OrderWiseProductDetails;
 import com.billing.app.accounts.externalapi.AccountsCommunicationFacade;
 import com.billing.app.accounts.externalapi.EmpServiceFiengClient;
 import com.billing.app.accounts.repositories.AccountsCollectionRepository;
 import com.billing.app.accounts.repositories.AccountsOrderItemsRepository;
 import com.billing.app.accounts.repositories.AccountsOrderRepository;
+import com.billing.app.accounts.repositories.OrderWiseProductsRepository;
 import com.billing.app.accounts.validations.OrderStatusValidation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -38,6 +43,9 @@ public class AccountsService {
 
     @Autowired
     AccountsOrderRepository accOrderRepo;
+    
+    @Autowired
+    OrderWiseProductsRepository owpRepo;
 
     @Autowired
     AccountsOrderItemsRepository accOrderItemsRepo;
@@ -128,8 +136,10 @@ public class AccountsService {
         orderDetails.setPackageCharge(totalPkgCharges);
         orderDetails.setTotalPrice(totalPrice);
         orderDetails.setCreatedDate(date);
-
+        orderDetails.setCustomerCode(req.getCustomerCode());
         oout = accOrderRepo.save(orderDetails);
+        
+        final Integer orderId=oout.getId();
 
         if (oout.getId() > 0) {
             orderCode = "OD0000" + String.valueOf(oout.getId());
@@ -157,6 +167,69 @@ public class AccountsService {
             }
 
         }
+        Runnable rn = new Runnable() {
+        	@Override
+        	public void run() {
+        		
+				for (ProductDetails pd : products) {
+					Double price;
+					Integer pdId = pd.getProductId();
+
+					StockDetails stockDetails = comm.getStockDetialsById(pdId);
+					List<ChargesDetails> chargesDetails = new ArrayList<>();
+
+					log.info("The stock details from external service call is --> " + stockDetails);
+					String category = stockDetails.getCategory();
+					chargesDetails = comm.getChargesDetails(category);
+
+					Double tGst = 0d;
+					Double tDiscount = 0d;
+					Double tPkg = 0d;
+
+					price = stockDetails.getCostPerUnit() * pd.getUnits();
+
+					for (ChargesDetails tempCharges : chargesDetails) {
+						if (tempCharges.getType().equals("GST")) {
+							tGst = price * tempCharges.getCharge() / 100;
+						}
+
+						if (tempCharges.getType().equals("DIS")) {
+							if (tempCharges.getChargeType().equals("F"))
+								tDiscount = tempCharges.getCharge();
+							else
+								tDiscount = price * tempCharges.getCharge() / 100;
+
+						}
+						if (tempCharges.getType().equals("PKG")) {
+							if (tempCharges.getChargeType().equals("F"))
+								tPkg = tempCharges.getCharge();
+							else
+								tPkg = price * tempCharges.getCharge() / 100;
+
+						}
+
+					}
+					OrderWiseProductDetails owp = new OrderWiseProductDetails();
+					owp.setDiscount(tDiscount);
+					owp.setGst(tGst);
+					owp.setCost(price);
+					owp.setUntis(pd.getUnits());
+					owp.setMrp(stockDetails.getCostPerUnit());
+					owp.setPkgChg(tPkg);
+					owp.setOrderId(orderId);
+					owp.setProductId(pdId);
+					owp.setTotalAmt(price + tGst + tPkg - tDiscount);
+
+					owpRepo.save(owp);
+
+				}
+        		
+        	}
+        	
+        	
+        };
+        Thread td = new Thread(rn);
+        td.start();
 
         response.setPrice(mrp);
         response.setDiscount(totalDiscount);
@@ -164,11 +237,16 @@ public class AccountsService {
         response.setPackageCharge(totalPkgCharges);
         response.setTotalPrice(totalPrice);
         response.setOrderId(String.valueOf(oout.getId()));
+        response.setOrderCode(orderCode);
+        response.setCustomerCode(req.getCustomerCode());
 
         return response;
     }
 
     public CollectionResponse doCollection(CollectionRequest req) {
+    	
+    	OrderDetails od= new OrderDetails();
+    	od=getOrderDetails(req.getOrderCode());
         CollectionResponse response = new CollectionResponse();
         OrderDetails odOut = new OrderDetails();
         odOut = valOd.validatedOrderStatus(req.getOrderId());
@@ -185,6 +263,9 @@ public class AccountsService {
         CollectionRequest out = new CollectionRequest();
         req.setStatus("I");
         req.setDate(date);
+        req.setAmount(od.getPrice());
+        req.setCustCode(od.getCustomerCode());
+        req.setOrderId(od.getId());
 
 
         out = accCollRepo.save(req);
@@ -250,6 +331,53 @@ public class AccountsService {
 
 	public OrderDetails getOrderDetails(String orderCode) {
 		// TODO Auto-generated method stub
-		return null;
+		return accOrderItemsRepo.findByOrderCode(orderCode);
+	}
+	
+	public OrderDetailsResponse getOrderSummry(String orderCode) {
+		OrderDetailsResponse odr = new OrderDetailsResponse();
+		
+		OrderDetails oout= accOrderRepo.findByOrderCode(orderCode);
+		
+		odr.setCreatedDate(oout.getCreatedDate());
+		odr.setCustomerCode(oout.getCustomerCode());
+		odr.setDiscount(oout.getDiscount());
+		odr.setGst(oout.getGst());
+		odr.setOrderCode(orderCode);
+		odr.setOrderStatus(oout.getOrderStatus());
+		odr.setPackageCharge(oout.getPackageCharge());
+		odr.setPrice(oout.getPrice());
+		odr.setTotalPrice(oout.getTotalPrice());
+		Integer unitTotal=0;
+		List<OrderWiseProductDetails> productDetailsList=owpRepo.findbyOrderId(oout.getId());
+		List<OrderWiseProductDetailsDTO> productDetails= new ArrayList<>();
+		for(OrderWiseProductDetails temp:productDetailsList) {
+			OrderWiseProductDetailsDTO tempDto= new OrderWiseProductDetailsDTO();
+			
+			tempDto.setCost(temp.getCost());
+			tempDto.setDiscount(temp.getDiscount());
+			tempDto.setGst(temp.getGst());
+			tempDto.setMrp(temp.getMrp());
+			tempDto.setPkgChg(temp.getPkgChg());
+			tempDto.setTotalAmt(temp.getTotalAmt());
+			tempDto.setUnits(temp.getUntis());
+			StockDetails stockDetails= new StockDetails();
+			stockDetails=comm.getStockDetialsById(temp.getProductId());
+			tempDto.setProductName(stockDetails.getBrand()+" "+stockDetails.getModel());
+			unitTotal=unitTotal+temp.getUntis();
+			productDetails.add(tempDto);
+			odr.setProductDetails(productDetails);
+		}
+		
+		
+		CustomerDetails custDetails = new CustomerDetails();
+		custDetails=comm.getCustDetailsByCode(oout.getCustomerCode());
+		odr.setCustomerDetail(custDetails);
+		odr.setUnits(unitTotal);
+		
+		
+		
+		
+		return odr;
 	}
 }

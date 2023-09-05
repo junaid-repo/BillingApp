@@ -31,7 +31,7 @@ public class CustomerController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	@GetMapping("/get/{custCode}")
-	ResponseEntity<CustomerDetails> saveCustomer(@PathVariable String custCode){
+	ResponseEntity<CustomerDetails> getCustomer(@PathVariable String custCode){
 		
 		CustomerDetails response = new CustomerDetails();
 		

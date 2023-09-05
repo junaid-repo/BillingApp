@@ -1,13 +1,16 @@
 package com.billing.app.accounts.entities;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -15,18 +18,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class OrderDetails {
-
+public class OrderWiseProductDetails {
+	
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String orderCode;
-    private Double price;
+    
+    private Integer orderId;
+    private Integer productId;
+    private Double mrp;
+    private Integer untis;
+    private Double cost;
     private Double discount;
     private Double gst;
-    private Double packageCharge;
-    private Double totalPrice;
-    private LocalDateTime createdDate;
-    private String orderStatus="F";
-    private String customerCode;
+    private Double pkgChg;
+    private Double totalAmt;
+
 }

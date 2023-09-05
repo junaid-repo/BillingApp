@@ -36,6 +36,19 @@ public class AccountsCommunicationFacade {
 
 
     }
+    public CustomerDetails getCustDetailsByCode(String code) {
+        log.info("Entered into getCustDetailsByCode method of StocksServiceCommunication class");
+        // StockDetails response = new StockDetails();
+        final String uri = "http://" + "CUSTOMER-SERVICE" + "/bs/customer/get/" + code;
+
+        log.info("The formatted uri is --> " + uri);
+
+        ResponseEntity<CustomerDetails> response = temp.exchange(uri, HttpMethod.GET, new HttpEntity<>(httpHeader()), CustomerDetails.class);
+
+        return response.getBody();
+
+
+    }
 
     public List<ChargesDetails> getChargesDetails(String category) {
 
