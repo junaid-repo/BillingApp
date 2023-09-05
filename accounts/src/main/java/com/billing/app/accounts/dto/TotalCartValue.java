@@ -15,4 +15,6 @@ public class TotalCartValue {
     private Double packageCharge;
     private Double totalPrice;
     private String orderId;
+    private String orderCode;
+    private String customerCode;
 }
