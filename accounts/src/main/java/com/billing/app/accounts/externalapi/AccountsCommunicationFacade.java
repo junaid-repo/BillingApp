@@ -36,6 +36,8 @@ public class AccountsCommunicationFacade {
 
 
     }
+  
+    
     public CustomerDetails getCustDetailsByCode(String code) {
         log.info("Entered into getCustDetailsByCode method of StocksServiceCommunication class");
         // StockDetails response = new StockDetails();
@@ -67,21 +69,20 @@ public class AccountsCommunicationFacade {
         log.info("The formatted uri is --> " + uri);
 
         ResponseEntity<BaseOutput2> response = temp.exchange(uri, HttpMethod.POST, new HttpEntity<>(httpHeader()), BaseOutput2.class);
-        log.info("the respose from getChargesDetails call --> " + response.getBody());
+      //  log.info("the respose from getChargesDetails call --> " + response.getBody());
        // return response.getBody();
     }
 
-    public void updateEmpSalesRecord(String number, String custCode, Double amount) {
+    public void updateEmpSalesRecord(EmployeeSales empSales) {
 
-        EmployeeSales empSales= new EmployeeSales();
-        empSales.setAmount(amount);
-        empSales.setCustomerCode(custCode);
-        empSales.setEmpId(Integer.parseInt(number));
+       
+        final String uri="http://" + "EMPLOYEE-SERVICE" + "/bs/employee/updateEmpSales";
+        
+       HttpEntity<EmployeeSales> request = new HttpEntity<>(empSales,  httpHeader());
 
-        final String uri="http://" + "EMPLOYEE-SERVICE" + "bs/employee/updateEmpSales/";
 
-       // ResponseEntity<BaseOutput3> response=temp.exchange(uri,HttpMethod.POST, new HttpEntity<>(httpHeader()), BaseOutput3.class);
-        ResponseEntity<BaseOutput3> response1= temp.postForEntity(uri, empSales, BaseOutput3.class);
+       ResponseEntity<BaseOutput3> response=temp.exchange(uri,HttpMethod.POST, request, BaseOutput3.class);
+       // ResponseEntity<BaseOutput3> response1= temp.postForEntity(uri, empSales, BaseOutput3.class);
 
     }
 
@@ -93,7 +94,7 @@ public class AccountsCommunicationFacade {
         return httpHeaders;
     }
     
-    private String getJwtToken() {
+    public String getJwtToken() {
     	
     	AuthRequest auth= new AuthRequest();
     	auth.setUsername("atifsohail5");
@@ -102,8 +103,11 @@ public class AccountsCommunicationFacade {
     	String token=epFC.generateToken(auth).getBody();
     	System.out.println("the generated token is --> "+token);
     	
-    	return null;
+    	return token;
     }
+
+
+	
 
 
 

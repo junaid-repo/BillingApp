@@ -48,7 +48,14 @@ spring:
           predicates:
             - Path=/bs/medStocks/**
           filters:
-           - AuthenticationFilter                        
+           - AuthenticationFilter 
+           
+        - id: API-GATEWAY
+          uri: lb://API-GATEWAY
+          predicates:
+            - Path=/bs/employee/**
+          filters:
+           - AuthenticationFilter                           
            
 
 eureka:

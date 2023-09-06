@@ -306,10 +306,13 @@ public class AccountsService {
         try {
 
             EmployeeSales esales = new EmployeeSales();
-            esales.setEmpId(52);
-            esales.setAmount(req.getAmount());
+            esales.setEmpId(Integer.parseInt(req.getEmpId()));
+            esales.setAmount(od.getTotalPrice());
             esales.setCustomerCode(req.getCustCode());
-            epFC.updateEmployeeSales(esales);
+            //String authToken=comm.getJwtToken();
+            //authToken ="Bearer "+authToken;
+            //System.out.println("The bearer token for update empsales call is  --> "+authToken);
+            comm.updateEmpSalesRecord(esales);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
